@@ -870,11 +870,13 @@
   /* ==========================================================
      18. Icons — <i class="ico" data-icon="steam"> → inline SVG (icons.js)
      ========================================================== */
+  const PIXEL_ICONS = new Set(["youtube", "play"]);
   function hydrateIcons() {
     const I = window.PONCLE_ICONS || {};
     $$("i.ico[data-icon]").forEach(el => {
       const d = I[el.dataset.icon]; if (!d) return;
-      el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${d}"/></svg>`;
+      const px = PIXEL_ICONS.has(el.dataset.icon);   // pixel-art icons: hard edges + cut-outs
+      el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"${px ? ' shape-rendering="crispEdges"' : ""}><path${px ? ' fill-rule="evenodd"' : ""} d="${d}"/></svg>`;
     });
   }
 

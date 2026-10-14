@@ -139,5 +139,5 @@ Each one is a real thing from Vampire Survivors.
 
 - Game names, logo, sprites and art © poncle LTD. This is a fan concept, not affiliated with or endorsed by poncle.
 - HeinzHeinrich by Stefanie Koerner (pheist.net), freeware. Its web-font clause allows serving the unmodified file via `@font-face`; the license is in `assets/fonts/HeinzHeinrich-license.pdf`.
-- Brand icons from Simple Icons (CC0). Trademarks belong to their owners.
+- Brand icons from Simple Icons (CC0). Trademarks belong to their owners. The YouTube and play icons are redrawn as pixel art to match the site.
 - Google Fonts: Jersey 10, Pixelify Sans, VT323, Rubik (SIL OFL).
