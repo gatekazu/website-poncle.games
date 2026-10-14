@@ -880,6 +880,8 @@
 
   // ---- boot ----
   hydrateIcons();
+  // store logo rows: split into two balanced rows, never a lone logo below
+  $$(".links").forEach(n => n.style.setProperty("--cols", Math.ceil(n.children.length / 2)));
   applyLang();
   restartFeat();
   observeReveals();

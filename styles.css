@@ -490,7 +490,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* Store row: logo + label (Landfall-style) */
 .store__label { margin: 0 0 10px; font: 18px/1 var(--f-num); letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
-.links { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 8px; }
+/* store logos: always two balanced rows (main.js sets --cols = ceil(count / 2)) */
+.links { display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); gap: 8px; }
 .game__foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 18px; margin-top: 22px; padding-top: 18px; border-top: 1px solid #ffffff1a; }
 .game__foot .links__more { margin: 0; }
 .btn--sm { padding: 11px 16px 9px; font-size: 16px; }

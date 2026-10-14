@@ -84,6 +84,8 @@ Values that will change over time:
 | Numbers, timer, HUD | VT323 |
 | Reading text | Rubik |
 
+Store logos under each game always split into two balanced rows: `main.js` sets `--cols = ceil(count / 2)`, so adding or removing a store keeps the grid even.
+
 ### Layout rule
 
 Every direct child of `.section` sits in one content lane (`--wrap: 1176px`, centred, with `--gutter` padding), so headings, grids and panels share the same left edge at every width. Don't give a section child its own horizontal margins.
