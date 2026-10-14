@@ -1,0 +1,504 @@
+<!doctype html>
+<!--
+  poncle.games — concept redesign
+  ===============================
+  Files
+    index.html   structure (this file). Visible text is the English default;
+                 main.js swaps it for the selected language using the
+                 data-i18n keys, whose text lives in content.js.
+    content.js   ALL editable content: featured slides, news, videos, music,
+                 Crawlers cards, characters, expansions, buddies, EN/ES strings.
+    icons.js     platform / social logos as inline SVG paths.
+    styles.css   look & feel (design tokens + table of contents at the top).
+    main.js      behaviour: parade mini-game, animations, language switch,
+                 easter eggs (numbered sections, index at the top).
+    assets/      logo, sprites, card frames, art, GIFs, fonts, UI frames.
+
+  Story: the page is a 30-minute Vampire Survivors run. Each section is a
+  real stage (Mad Forest, Inlaid Library, Dairy Plant, Gallo Tower,
+  Cappella Magna, Laborratory) stamped with the minute you reach it;
+  the Reaper waits in the footer at 30:00.
+
+  Page order: nav · hero (split + parade) · platforms strip · games ·
+  character select · expansions · lore · updates/TV/jobs · help · footer.
+
+  Icons: <i class="ico" data-icon="steam"></i> is replaced by an inline
+  SVG at load time (names = keys in icons.js).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>poncle</title>
+  <meta name="description" content="poncle — the studio behind Vampire Survivors and Vampire Crawlers.">
+  <meta name="theme-color" content="#0b0a14">
+  <link rel="icon" href="assets/anim/BlueExperienceGem.png">
+
+  <!-- Fonts: HeinzHeinrich (local, pheist freeware, web-font use allowed) for hero/game/footer titles only;
+       Jersey 10 for section titles; Pixelify Sans UI; VT323 numbers; Rubik body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Pixelify+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#games" data-i18n="skip">Skip to games</a>
+
+  <!-- ===================== TOP CHROME ===================== -->
+
+  <!-- Scroll indicator: one experience gem per section (fills as you pass it) -->
+  <nav class="gemnav" aria-label="Sections">
+    <a href="#top" data-i18n-aria="nav.top" aria-label="Top"><img src="assets/anim/BlueExperienceGem.png" alt=""></a>
+    <a href="#games" data-i18n-aria="nav.games" aria-label="Games"><img src="assets/anim/BlueExperienceGem.png" alt=""></a>
+    <a href="#roster" data-i18n-aria="nav.roster" aria-label="Survivors"><img src="assets/anim/GreenExperienceGem.png" alt=""></a>
+    <a href="#dlc" data-i18n-aria="nav.dlc" aria-label="Expansions"><img src="assets/anim/GreenExperienceGem.png" alt=""></a>
+    <a href="#lore" data-i18n-aria="nav.lore" aria-label="Our story"><img src="assets/anim/RedExperienceGem.png" alt=""></a>
+    <a href="#jobs" data-i18n-aria="nav.news" aria-label="News"><img src="assets/anim/RedExperienceGem.png" alt=""></a>
+    <a href="#help" data-i18n-aria="nav.help" aria-label="Help"><img src="assets/anim/RedExperienceGem.png" alt=""></a>
+  </nav>
+
+  <header class="nav">
+    <a class="nav__logo" href="#top" aria-label="poncle">
+      <img src="assets/poncle-logo.png" alt="poncle" width="120" height="39">
+    </a>
+
+    <nav class="nav__links" aria-label="Main">
+      <a href="#games" data-i18n="nav.games">Games</a>
+      <a href="#roster" data-i18n="nav.roster">Survivors</a>
+      <a href="#dlc" data-i18n="nav.dlc">Expansions</a>
+      <a href="#lore" data-i18n="nav.lore">Our story</a>
+      <a href="#jobs" data-i18n="nav.jobs">Jobs</a>
+      <a href="#help" data-i18n="nav.help">Help</a>
+    </nav>
+
+    <div class="nav__tools">
+      <!-- run clock: 00:00 at the top of the page, 30:00 at the bottom -->
+      <span class="clock" aria-hidden="true"><b class="clock__hyper">HYPER</b><span id="run-clock">00:00</span><b class="clock__lv">LV <span id="run-lv">1</span></b></span>
+      <!-- opens the jukebox (official OST from YouTube) -->
+      <button class="chip" id="music-btn" aria-expanded="false" aria-controls="jukebox" data-i18n-title="music.title" title="Jukebox">
+        <span class="chip__note" aria-hidden="true">♪</span>
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sr" data-i18n="music.title">Jukebox</span>
+      </button>
+      <div class="lang" role="group" aria-label="Language">
+        <button data-lang="en" aria-pressed="true">EN</button>
+        <button data-lang="es" aria-pressed="false">ES</button>
+      </div>
+      <button class="nav__burger" aria-expanded="false" aria-controls="mobile-menu" aria-label="Menu">
+        <!-- pixel icon: bars when closed, stepped X when open -->
+        <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges">
+          <path class="burger__bars" d="M2 3h12v2H2zM2 7h12v2H2zM2 11h12v2H2z"/>
+          <path class="burger__x" d="M3 3h2v2H3zM5 5h2v2H5zM7 7h2v2H7zM9 9h2v2H9zM11 11h2v2h-2zM11 3h2v2h-2zM9 5h2v2H9zM5 9h2v2H5zM3 11h2v2H3z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <a href="#games" data-i18n="nav.games">Games</a>
+    <a href="#roster" data-i18n="nav.roster">Survivors</a>
+    <a href="#dlc" data-i18n="nav.dlc">Expansions</a>
+    <a href="#lore" data-i18n="nav.lore">Our story</a>
+    <a href="#jobs" data-i18n="nav.jobs">Jobs</a>
+    <a href="#help" data-i18n="nav.help">Help</a>
+  </div>
+
+  <!-- Jukebox: official soundtrack videos (edit the "music" list in content.js) -->
+  <aside class="jukebox panel" id="jukebox" hidden aria-labelledby="jb-heading">
+    <div class="jukebox__head">
+      <h2 id="jb-heading" data-i18n="music.title">Jukebox</h2>
+      <button class="jukebox__x" id="jb-close" data-i18n-aria="uc.close" aria-label="Close">✕</button>
+    </div>
+    <div class="jukebox__player" id="jb-player">
+      <p class="jukebox__empty" data-i18n="music.pick">Pick a track. It plays straight from the official poncle channel.</p>
+    </div>
+    <ol class="jukebox__list" id="jb-list"></ol>
+    <div class="jukebox__foot">
+      <label class="toggle"><input type="checkbox" id="sfx-toggle"><span class="toggle__ui" aria-hidden="true"></span><span data-i18n="sfx">Sound effects</span></label>
+      <a href="https://www.youtube.com/@poncle_games/videos" target="_blank" rel="noopener" data-i18n="music.more">More on YouTube →</a>
+    </div>
+  </aside>
+
+  <main id="top">
+
+    <!-- ===================== 00:00 · HERO =====================
+         Full-screen split: one half per flagship game (hover expands it).
+         Bottom: the "parade" — survivors marching and auto-fighting on a
+         <canvas>; click/tap it to strike with lightning.
+         Ratings: Steam, October 2026. -->
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title" class="sr" data-i18n="hero.h1">poncle — makers of Vampire Survivors and Vampire Crawlers</h1>
+
+      <div class="split-hero">
+        <article class="hgame hgame--vs">
+          <img class="hgame__bg" src="assets/art/slide-survivors.jpg" alt="">
+          <div class="hgame__fx" aria-hidden="true"></div>
+          <div class="hgame__body">
+            <img class="hgame__sprite" src="assets/sprites/Antonio_Belpaese.png" alt="">
+            <p class="hgame__kicker" data-i18n="hero.vs.kicker">98% Overwhelmingly Positive · BAFTA Best Game</p>
+            <h2 class="hgame__title">Vampire<br>Survivors</h2>
+            <p class="hgame__text" data-i18n="hero.vs.text">Thirty minutes. Thousands of bats. One whip to start.</p>
+            <div class="hgame__ctas">
+              <a class="btn btn--gold" href="https://store.steampowered.com/app/1794680/Vampire_Survivors/" target="_blank" rel="noopener"><i class="ico" data-icon="steam"></i><span data-i18n="hero.play">Play now</span></a>
+              <span class="hgame__price">$4.99</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hgame hgame--vc">
+          <img class="hgame__bg" src="assets/art/slide-crawlers.jpg" alt="">
+          <div class="hgame__fx" aria-hidden="true"></div>
+          <div class="hgame__body">
+            <img class="hgame__sprite" src="assets/crawlers/CSprite-Imelda.png" alt="">
+            <p class="hgame__kicker" data-i18n="hero.vc.kicker">New · 96% Overwhelmingly Positive</p>
+            <h2 class="hgame__title">Vampire<br>Crawlers</h2>
+            <p class="hgame__text" data-i18n="hero.vc.text">The same night, new rules. A turn-based deckbuilder.</p>
+            <div class="hgame__ctas">
+              <a class="btn btn--blood" href="https://store.steampowered.com/app/3265700/Vampire_Crawlers_The_Turbo_Wildcard_from_Vampire_Survivors/" target="_blank" rel="noopener"><i class="ico" data-icon="steam"></i><span data-i18n="hero.play">Play now</span></a>
+              <span class="hgame__price">$9.99</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- seal over the seam -->
+        <div class="hero__seal" aria-hidden="true">
+          <img src="assets/poncle-logo.png" alt="">
+          <span data-i18n="hero.tagline">Two games. One very long night.</span>
+        </div>
+      </div>
+
+      <div class="parade">
+        <canvas id="parade" aria-hidden="true"></canvas>
+        <div class="parade__hud" aria-hidden="true">
+          <span class="parade__lv">LV <b id="hud-lv">1</b><span class="parade__xp"><i id="hud-xp"></i></span></span>
+          <span><img src="assets/sprites/Skeleton.png" alt=""><b id="hud-kills">0</b></span>
+          <span><img src="assets/sprites/Gold_Coin.png" alt=""><b id="hud-gold">0</b></span>
+        </div>
+        <p class="parade__hint" aria-hidden="true" data-i18n="parade.hint">Click to strike</p>
+        <div class="levelup" id="levelup" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- Platforms strip: continues the parade's ground so the hero doesn't end abruptly -->
+    <div class="platforms" aria-label="Available on">
+      <p class="platforms__label" data-i18n="store.label">Available on</p>
+      <ul class="platforms__list">
+        <li title="Steam"><i class="ico" data-icon="steam"></i><span>Steam</span></li>
+        <li title="Xbox · Game Pass"><i class="ico" data-icon="xbox"></i><span>Xbox</span></li>
+        <li title="PlayStation"><i class="ico" data-icon="playstation"></i><span>PlayStation</span></li>
+        <li title="Nintendo Switch"><i class="ico" data-icon="nintendoswitch"></i><span>Switch</span></li>
+        <li title="Epic Games Store"><i class="ico" data-icon="epicgames"></i><span>Epic</span></li>
+        <li title="iOS · Apple Arcade"><i class="ico" data-icon="apple"></i><span>iOS</span></li>
+        <li title="Android"><i class="ico" data-icon="googleplay"></i><span>Android</span></li>
+        <li title="Meta Quest"><i class="ico" data-icon="meta"></i><span>Quest</span></li>
+      </ul>
+    </div>
+
+    <!-- ===================== 05:00 · GAMES (newest first) ===================== -->
+    <section class="section stage stage--forest" id="games" aria-labelledby="games-title" data-minute="5">
+      <header class="section__head">
+        <p class="stamp" data-i18n="games.stamp">05:00 · Stage select</p>
+        <h2 id="games-title" class="title" data-i18n="games.title">Two ways to lose an evening</h2>
+      </header>
+
+      <!-- Vampire Crawlers — the hand of real cards is built from content.js (crawlerCards) -->
+      <article class="game game--vc reveal">
+        <div class="game__art game__art--cards">
+          <div class="deck" id="deck" aria-label="Vampire Crawlers cards"></div>
+          <p class="deck__hint" data-i18n="deck.hint">Hover to fan the hand · click a card to play it</p>
+        </div>
+
+        <div class="game__body panel panel--blood">
+          <p class="tag tag--new" data-i18n="vc.tag">New · casual turn-based deckbuilder</p>
+          <h3 class="game__name">Vampire Crawlers</h3>
+          <p class="game__sub" data-i18n="vc.sub">The Turbo Wildcard from Vampire Survivors</p>
+          <p class="game__pitch" data-i18n="vc.pitch"></p>
+          <ul class="stats">
+            <li><b>21.04.26</b><span data-i18n="vc.s1">launch</span></li>
+            <li><b>$9.99</b><span data-i18n="vc.s2">on Steam, Day 1 on Game Pass</span></li>
+            <li><b>1M</b><span data-i18n="vc.s3">crawlers in week one</span></li>
+          </ul>
+          <!-- Store links: logo + label -->
+          <p class="store__label" data-i18n="store.label">Available on</p>
+          <nav class="links" aria-label="Vampire Crawlers links">
+            <a href="https://store.steampowered.com/app/3265700/Vampire_Crawlers_The_Turbo_Wildcard_from_Vampire_Survivors/" target="_blank" rel="noopener" aria-label="Steam" title="Steam"><i class="ico" data-icon="steam"></i></a>
+            <a href="https://www.xbox.com/games/store/vampire-crawlers-the-turbo-wildcard-from-vampire-survivors/9nmpvj7tcfd0" target="_blank" rel="noopener" aria-label="Xbox · Game Pass" title="Xbox · Game Pass"><i class="ico" data-icon="xbox"></i></a>
+            <a href="https://store.playstation.com/concept/10015481" target="_blank" rel="noopener" aria-label="PlayStation 5" title="PlayStation 5"><i class="ico" data-icon="playstation"></i></a>
+            <a href="https://www.nintendo.com/en-gb/Games/Nintendo-Switch-download-software/Vampire-Crawlers-The-Turbo-Wildcard-from-Vampire-Survivors-3055039.html" target="_blank" rel="noopener" aria-label="Nintendo Switch" title="Nintendo Switch"><i class="ico" data-icon="nintendoswitch"></i></a>
+            <a href="https://store.epicgames.com/p/vampire-crawlers-the-turbo-wildcard-from-vampire-survivors-30afdb" target="_blank" rel="noopener" aria-label="Epic Games Store" title="Epic Games Store"><i class="ico" data-icon="epicgames"></i></a>
+            <a href="https://apps.apple.com/us/app/vampire-crawlers/id6749456796" target="_blank" rel="noopener" aria-label="App Store (iOS)" title="App Store (iOS)"><i class="ico" data-icon="apple"></i></a>
+            <a href="https://play.google.com/store/apps/details?id=com.poncle.vampirecrawlers" target="_blank" rel="noopener" aria-label="Google Play (Android)" title="Google Play (Android)"><i class="ico" data-icon="googleplay"></i></a>
+          </nav>
+          <div class="game__foot">
+            <a class="btn btn--blood btn--sm" href="https://www.youtube.com/watch?v=EBdNab2gVTk" target="_blank" rel="noopener"><i class="ico" data-icon="youtube"></i><span data-i18n="l.trailer">Trailer</span></a>
+            <p class="links__more">
+            <a href="https://store.steampowered.com/news/app/3265700" target="_blank" rel="noopener" data-i18n="l.patch">Patch notes</a> ·
+            <a href="https://vampire.survivors.wiki/w/Crawlers:Wiki" target="_blank" rel="noopener">Wiki</a>
+          </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Vampire Survivors -->
+      <article class="game game--vs reveal">
+        <div class="game__art">
+          <div class="crt">
+            <img class="crt__img" src="assets/art/vs-gameplay.jpg" alt="Vampire Survivors gameplay: Antonio surrounded by bats in the Mad Forest" loading="lazy">
+          </div>
+          <img class="game__hero bob" src="assets/sprites/Antonio_Belpaese.png" alt="" loading="lazy">
+        </div>
+
+        <div class="game__body panel">
+          <p class="tag" data-i18n="vs.tag">Gothic horror roguelite</p>
+          <h3 class="game__name">Vampire Survivors</h3>
+          <p class="game__sub" data-i18n="vs.sub">The one that started it all</p>
+          <p class="game__pitch" data-i18n="vs.pitch"></p>
+          <ul class="stats">
+            <li><b>225</b><span data-i18n="vs.s1">playable survivors</span></li>
+            <li><b>8</b><span data-i18n="vs.s2">expansions</span></li>
+            <li><b>2023</b><span data-i18n="vs.s3">BAFTA Best Game</span></li>
+          </ul>
+          <p class="store__label" data-i18n="store.label">Available on</p>
+          <nav class="links" aria-label="Vampire Survivors links">
+            <a href="https://store.steampowered.com/app/1794680/Vampire_Survivors/" target="_blank" rel="noopener" aria-label="Steam" title="Steam"><i class="ico" data-icon="steam"></i></a>
+            <a href="https://www.xbox.com/en-us/games/store/vampire-survivors/9pd5bm2z8c4l" target="_blank" rel="noopener" aria-label="Xbox · Game Pass" title="Xbox · Game Pass"><i class="ico" data-icon="xbox"></i></a>
+            <a href="https://store.playstation.com/en-gb/concept/10010458" target="_blank" rel="noopener" aria-label="PlayStation" title="PlayStation"><i class="ico" data-icon="playstation"></i></a>
+            <a href="https://www.nintendo.co.uk/Games/Nintendo-Switch-download-software/Vampire-Survivors-2401343.html" target="_blank" rel="noopener" aria-label="Nintendo Switch" title="Nintendo Switch"><i class="ico" data-icon="nintendoswitch"></i></a>
+            <a href="https://store.epicgames.com/p/vampire-survivors-f699a1" target="_blank" rel="noopener" aria-label="Epic Games Store" title="Epic Games Store"><i class="ico" data-icon="epicgames"></i></a>
+            <a href="https://apps.apple.com/app/id6444525702" target="_blank" rel="noopener" aria-label="App Store (iOS)" title="App Store (iOS)"><i class="ico" data-icon="apple"></i></a>
+            <a href="https://play.google.com/store/apps/details?id=com.poncle.vampiresurvivors" target="_blank" rel="noopener" aria-label="Google Play (Android)" title="Google Play (Android)"><i class="ico" data-icon="googleplay"></i></a>
+            <a href="https://poncle.games/arcade-faq" target="_blank" rel="noopener" aria-label="Apple Arcade (Vampire Survivors+)" title="Apple Arcade (Vampire Survivors+)"><i class="ico" data-icon="applearcade"></i></a>
+            <a href="https://poncle.games/vr-faq" target="_blank" rel="noopener" aria-label="Meta Quest (VR)" title="Meta Quest (VR)"><i class="ico" data-icon="meta"></i></a>
+          </nav>
+          <div class="game__foot">
+            <a class="btn btn--blood btn--sm" href="https://www.youtube.com/@poncle_games/videos" target="_blank" rel="noopener"><i class="ico" data-icon="youtube"></i><span data-i18n="l.trailer">Trailer</span></a>
+            <p class="links__more">
+            <a href="https://store.steampowered.com/news/app/1794680" target="_blank" rel="noopener" data-i18n="l.patch">Patch notes</a> ·
+            <a href="https://vampire.survivors.wiki/" target="_blank" rel="noopener">Wiki</a>
+          </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Spin-offs and published games (as listed on poncle.games) -->
+      <div class="friends">
+        <h3 class="subtitle" data-i18n="friends.title">Also crawling out of the crypt</h3>
+        <div class="friends__grid">
+          <a class="mini reveal" href="https://poncle.games/ante-chamber-faq" target="_blank" rel="noopener">
+            <span class="mini__badge">♠</span>
+            <strong>Ante Chamber</strong>
+            <span data-i18n="friends.ante">Free expansion themed around Balatro.</span>
+            <small>10 · 2025</small>
+          </a>
+          <a class="mini reveal" href="https://poncle.games/vr-faq" target="_blank" rel="noopener">
+            <span class="mini__badge">VR</span>
+            <strong>Vampire Survivors VR</strong>
+            <span data-i18n="friends.vr">Vampire Survivors, now around you.</span>
+            <small>Meta Quest · 11 · 2025</small>
+          </a>
+          <a class="mini reveal" href="https://poncle.games/kill-the-brickman-faq" target="_blank" rel="noopener">
+            <span class="mini__badge" data-i18n="friends.pub">Published</span>
+            <strong>Kill The Brickman</strong>
+            <span data-i18n="friends.brick">Turn-based roguelike bullet-builder by Doonutsaur.</span>
+            <small>Steam · Xbox · 08 · 2025</small>
+          </a>
+          <a class="mini reveal" href="https://poncle.games/berserk-or-die-faq" target="_blank" rel="noopener">
+            <span class="mini__badge" data-i18n="friends.pub">Published</span>
+            <strong>Berserk or Die</strong>
+            <span data-i18n="friends.berserk">Keyboard-bashing hack and slash by solo dev Nao Games.</span>
+            <small>Steam · 06 · 2025</small>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 10:00 · CHARACTER SELECT (grid built from content.js) ===================== -->
+    <section class="section stage stage--library" id="roster" aria-labelledby="roster-title" data-minute="10">
+      <header class="section__head">
+        <p class="stamp" data-i18n="roster.stamp">10:00 · Character select</p>
+        <h2 id="roster-title" class="title" data-i18n="roster.title">Who's taking the night shift?</h2>
+        <p class="section__lede" data-i18n="roster.lede"></p>
+      </header>
+
+      <div class="select">
+        <div class="select__grid" id="roster-grid" role="listbox" aria-label="Survivors"></div>
+        <aside class="select__card panel" aria-live="polite">
+          <div class="select__portrait"><img id="sel-img" src="assets/sprites/Antonio_Belpaese.png" alt=""></div>
+          <div class="select__info">
+            <h3 id="sel-name">Antonio Belpaese</h3>
+            <p class="select__weapon"><span data-i18n="roster.starts">Starts with</span> <img id="sel-wimg" src="assets/sprites/Whip.png" alt=""> <b id="sel-weapon">Whip</b></p>
+            <p class="select__desc" id="sel-desc"></p>
+            <p class="select__unlock" id="sel-unlock" hidden></p>
+          </div>
+          <p class="select__count">
+            <span data-i18n="roster.count">Showing 20 of</span> <b>225</b> ·
+            <a href="https://vampire.survivors.wiki/w/Characters" target="_blank" rel="noopener" data-i18n="roster.all">see them all on the wiki</a>
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===================== 15:00 · EXPANSIONS as chests (built from content.js) ===================== -->
+    <section class="section stage stage--dairy" id="dlc" aria-labelledby="dlc-title" data-minute="15">
+      <header class="section__head">
+        <p class="stamp" data-i18n="dlc.stamp">15:00 · Treasure</p>
+        <h2 id="dlc-title" class="title" data-i18n="dlc.title">A chest dropped. Several, actually.</h2>
+        <p class="section__lede" data-i18n="dlc.lede"></p>
+      </header>
+      <ol class="chests" id="chests"></ol>
+    </section>
+
+    <!-- ===================== 20:00 · STUDIO STORY ===================== -->
+    <section class="section stage stage--tower" id="lore" aria-labelledby="lore-title" data-minute="20">
+      <header class="section__head">
+        <p class="stamp" data-i18n="lore.stamp">20:00 · The lore</p>
+        <h2 id="lore-title" class="title" data-i18n="lore.title">How one developer and a whip got out of hand</h2>
+      </header>
+
+      <ol class="lore">
+        <li class="lore__step reveal"><span class="lore__year">2022</span><img src="assets/sprites/Whip.png" alt=""><p data-i18n="lore.1"></p></li>
+        <li class="lore__step reveal"><span class="lore__year">2023</span><img src="assets/sprites/Laurel.png" alt=""><p data-i18n="lore.2"></p></li>
+        <li class="lore__step reveal"><span class="lore__year">2024</span><img src="assets/sprites/Gold_Coin.png" alt=""><p data-i18n="lore.3"></p></li>
+        <li class="lore__step reveal"><span class="lore__year">2025</span><img src="assets/sprites/Song_of_Mana.png" alt=""><p data-i18n="lore.4"></p></li>
+        <li class="lore__step reveal"><span class="lore__year">2026</span><img src="assets/sprites/Little_Clover.png" alt=""><p data-i18n="lore.5"></p></li>
+      </ol>
+
+      <!-- data-count = target number, data-suffix is appended after it -->
+      <ul class="counters">
+        <li class="panel"><b data-count="25" data-suffix="+">0</b><span data-i18n="studio.c1">people on the team</span></li>
+        <li class="panel"><b data-count="225">0</b><span data-i18n="studio.c2">playable survivors</span></li>
+        <li class="panel"><b data-count="8">0</b><span data-i18n="studio.c3">Vampire Survivors expansions</span></li>
+        <li class="panel"><b data-count="1" data-suffix="M">0</b><span data-i18n="studio.c4">Vampire Crawlers players in week one</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================== 25:00 · UPDATES + poncle TV + JOBS / PUBLISHING ===================== -->
+    <section class="section stage stage--cappella" id="jobs" aria-labelledby="news-title" data-minute="25">
+      <header class="section__head">
+        <p class="stamp" data-i18n="news.stamp">25:00 · Things are getting busy</p>
+        <h2 id="news-title" class="title" data-i18n="news.title">From the crypt</h2>
+      </header>
+
+      <!-- Featured carousel (content.js → featured). Gem dots only; autoplays, swipeable. -->
+      <div class="featured" id="featured" aria-roledescription="carousel" aria-label="Featured" tabindex="0">
+        <div class="featured__track" id="feat-track"></div>
+        <div class="featured__dots" id="feat-dots"></div>
+      </div>
+
+      <div class="feed">
+        <!-- Update cards: edit "news" in content.js -->
+        <div class="feed__news">
+          <h3 class="subtitle">
+            <span data-i18n="news.updates">Updates</span>
+            <a class="feed__more" href="https://store.steampowered.com/news/app/1794680" target="_blank" rel="noopener" data-i18n="news.steam">All patch notes on Steam →</a>
+          </h3>
+          <div class="news__grid" id="news-grid"></div>
+        </div>
+
+        <!-- poncle TV: the poster plays the channel's newest upload; thumbnails come from content.js -->
+        <div class="feed__tv">
+          <h3 class="subtitle">
+            <span data-i18n="tv.title">poncle TV</span>
+            <a class="feed__more" href="https://www.youtube.com/@poncle_games?sub_confirmation=1" target="_blank" rel="noopener" data-i18n="tv.sub">Subscribe →</a>
+          </h3>
+          <div class="tv panel">
+            <div class="tv__screen" id="tv-screen">
+              <button class="tv__poster" id="tv-play" data-i18n-aria="tv.play" aria-label="Play the latest video">
+                <img id="tv-thumb" src="https://i.ytimg.com/vi/EBdNab2gVTk/hqdefault.jpg" alt="" loading="lazy">
+                <span class="tv__btn" aria-hidden="true">▶</span>
+                <span class="tv__label" id="tv-label"></span>
+              </button>
+            </div>
+            <ul class="tv__list" id="tv-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="panel panel--green cta-card reveal">
+          <img class="cta-card__sprite bob" src="assets/sprites/Krochi_Freetto.png" alt="">
+          <p class="stamp stamp--plain" data-i18n="jobs.eyebrow">Jobs</p>
+          <h2 id="jobs-title" class="title title--sm" data-i18n="jobs.title">The coven is recruiting</h2>
+          <p data-i18n="jobs.p"></p>
+          <a class="btn btn--green" href="https://poncle.games/" target="_blank" rel="noopener" data-i18n="jobs.cta">See open roles</a>
+        </div>
+        <div class="panel cta-card reveal">
+          <img class="cta-card__sprite bob" src="assets/sprites/Treasure_Chest.png" alt="">
+          <p class="stamp stamp--plain" data-i18n="pub.eyebrow">Publishing</p>
+          <h2 class="title title--sm" data-i18n="pub.title">Making something weird?</h2>
+          <p data-i18n="pub.p"></p>
+          <a class="btn btn--gold" href="mailto:marketing@poncle.co.uk" data-i18n="pub.cta">Get in touch</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 29:00 · HELP / CONTACT (addresses from poncle.games) ===================== -->
+    <section class="section stage stage--lab" id="help" aria-labelledby="help-title">
+      <header class="section__head">
+        <p class="stamp" data-i18n="help.stamp">29:00 · Last chance to heal</p>
+        <h2 id="help-title" class="title" data-i18n="help.title">Need a floor chicken?</h2>
+      </header>
+      <div class="contact">
+        <a class="contact__item panel reveal" href="mailto:support@poncle.co.uk">
+          <img src="assets/sprites/Floor_Chicken.png" alt="">
+          <span data-i18n="help.support">Player support</span><b>support@poncle.co.uk</b>
+        </a>
+        <a class="contact__item panel reveal" href="mailto:media@poncle.co.uk">
+          <img src="assets/sprites/Candelabrador.png" alt="">
+          <span data-i18n="help.media">Press &amp; media</span><b>media@poncle.co.uk</b>
+        </a>
+        <a class="contact__item panel reveal" href="mailto:marketing@poncle.co.uk">
+          <img src="assets/sprites/Gold_Coin.png" alt="">
+          <span data-i18n="help.marketing">Marketing &amp; business</span><b>marketing@poncle.co.uk</b>
+        </a>
+        <a class="contact__item panel reveal" href="https://poncle.games/faqs" target="_blank" rel="noopener">
+          <img src="assets/sprites/Empty_Tome.png" alt="">
+          <span data-i18n="help.faq">FAQs &amp; accounts</span><b>poncle.games/faqs</b>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== 30:00 · FOOTER — the Reaper arrives ===================== -->
+  <footer class="footer stage stage--night" id="reaper-zone">
+    <div class="rain rain--footer" id="footer-rain" aria-hidden="true"></div>
+    <div class="reaper" aria-hidden="true"><img id="reaper-img" src="assets/sprites/The_Reaper.png" alt=""></div>
+    <p class="stamp stamp--blood" data-i18n="footer.stamp">30:00</p>
+    <h2 class="footer__title" data-i18n="footer.title">He's here. Thanks for surviving.</h2>
+    <p class="footer__run" id="run-summary"></p>
+
+    <nav class="socials" aria-label="Social">
+      <a href="https://discord.com/invite/vampire-survivors" target="_blank" rel="noopener"><i class="ico" data-icon="discord"></i>Discord</a>
+      <a href="https://www.youtube.com/@poncle_games" target="_blank" rel="noopener"><i class="ico" data-icon="youtube"></i>YouTube</a>
+      <a href="https://twitter.com/poncle_vampire" target="_blank" rel="noopener"><i class="ico" data-icon="x"></i>X</a>
+      <a href="https://bsky.app/profile/vampire.poncle.games" target="_blank" rel="noopener"><i class="ico" data-icon="bluesky"></i>Bluesky</a>
+      <a href="https://www.tiktok.com/@poncle_games" target="_blank" rel="noopener"><i class="ico" data-icon="tiktok"></i>TikTok</a>
+      <a href="https://www.reddit.com/r/VampireSurvivors/" target="_blank" rel="noopener"><i class="ico" data-icon="reddit"></i>Reddit</a>
+      <a href="https://store.steampowered.com/search/?developer=poncle" target="_blank" rel="noopener"><i class="ico" data-icon="steam"></i>Steam</a>
+    </nav>
+
+    <div class="footer__bottom">
+      <img src="assets/poncle-logo.png" alt="poncle" width="96" height="31">
+      <p class="footer__legal">
+        © poncle LTD ·
+        <a href="https://poncle.games/privacypolicy" target="_blank" rel="noopener">Privacy</a> ·
+        <a href="https://vampire.survivors.wiki/" target="_blank" rel="noopener">Wiki</a>
+      </p>
+      <p class="footer__fan" data-i18n="footer.fan">Fan-made concept. Not affiliated with poncle LTD. Sprites © poncle.</p>
+      <p class="footer__secret" data-i18n="footer.secret">↑↑↓↓←→←→BA</p>
+    </div>
+  </footer>
+
+  <!-- Corner buddy (animated GIFs from poncle.games) + walking Gatti Amari cats -->
+  <button class="buddy" id="buddy" data-i18n-aria="buddy.aria" aria-label="Say hi to the survivor">
+    <span class="buddy__say" id="buddy-say" aria-live="polite"></span>
+    <img id="buddy-img" src="assets/anim/poe.gif" alt="">
+  </button>
+  <div class="cats" id="cats" aria-hidden="true"></div>
+
+  <!-- data first, behaviour last -->
+  <script src="content.js"></script>
+  <script src="icons.js"></script>
+  <script src="main.js" defer></script>
+</body>
+</html>
