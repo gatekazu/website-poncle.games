@@ -274,7 +274,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .jukebox[hidden] { display: none; }
 .jukebox__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .jukebox__head h2 { margin: 0; font: 400 34px/1 var(--f-display); color: var(--gold); text-shadow: 2px 2px 0 #000; }
-.jukebox__x { width: 32px; height: 32px; background: #0006; border: 2px solid var(--line); }
+.jukebox__x { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; color: var(--ink); }
+.jukebox__x svg { width: 20px; height: 20px; fill: currentColor; }
 .jukebox__x:hover { border-color: var(--gold); color: var(--gold); }
 .jukebox__player { position: relative; aspect-ratio: 16 / 9; background: #000; border: 2px solid #000; display: grid; place-items: center; }
 .jukebox__player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
